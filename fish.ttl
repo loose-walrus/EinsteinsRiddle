@@ -1,0 +1,277 @@
+prefix xsd: <http://www.w3.org/2001/XMLSchema#>
+prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntaxns#>
+prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+prefix owl: <http://www.w3.org/2002/07/owl#>
+prefix ex: <http://skidmore.edu/cs277/lweber#>
+
+
+#The Brit lives in a red house. 
+#The Swede keeps dogs as pets. 
+#The Dane drinks tea. 
+#The green house is next to, and on the left of the white house. 
+#The owner of the green house drinks coffee. 
+#The person who smokes Pall Mall rears birds. 
+#The owner of the yellow house smokes Dunhill. 
+#The man living in the center house drinks milk. 
+#The Norwegian lives in the first house. 
+#The man who smokes blends lives next to the one who keeps cats.
+#The man who keeps horses lives next to the man who smokes Dunhill. 
+#The man who smokes Blue Master drinks beer.
+#The German smokes Prince.  
+#The Norwegian lives next to the blue house. 
+#The man who smokes blends has a neighbor who drinks water.
+
+#Who owns the fish? 
+
+
+####################### DEFINE CLASSES #########################################
+
+ex:Houses a owl:Class ;
+	owl:oneOf ( ex:one ex:two ex:three ex:four ex:five ) ;
+	rdfs:subClassOf [ 
+	a owl:Restriction ; 
+	owl:onProperty ex:nextTo ; 
+	owl:maxCardinality 2 
+	] .
+
+owl:AllDifferent owl:distinctMembers ( ex:one ex:two ex:three ex:four ex:five ) .
+
+ex:one ex:leftOf ex:two .
+ex:two ex:leftOf ex:three .
+ex:three ex:leftOf ex:four .
+ex:four ex:leftOf ex:five.
+
+
+
+ex:OuterHouse a owl:Class ; 
+	owl:equivalentClass [ 
+	a owl:Restriction ; 
+	owl:onProperty ex:nextTo ; 
+	owl:cardinality 1 
+	] .
+
+ex:NoRight a owl:Class ; 
+	owl:intersectionOf ( [ 
+	a owl:Restriction ; 
+	owl:onProperty ex:leftOf ; 
+	owl:cardinality 0 ] 
+    	ex:OuterHouse ) .
+
+ex:five a ex:NoRight .
+
+ex:NoLeft rdf:type owl:Class ; 
+	owl:intersectionOf ( [ 
+	a owl:Restriction ;
+	owl:onProperty ex:rightOf ; 
+	owl:cardinality 0 ] 
+    	ex:OuterHouse ) .
+
+ex:one a ex:NoLeft .
+
+ex:rightOf a owl:ObjectProperty ; 
+	a owl:FunctionalProperty ; 
+   	owl:inverseOf ex:leftOf ;
+   	rdfs:subPropertyOf ex:nextTo .
+
+ex:leftOf a owl:ObjectProperty ; 
+	a owl:FunctionalProperty ; 
+   	rdfs:subPropertyOf ex:nextTo .
+
+ex:nextTo a owl:ObjectProperty ; 
+   	rdfs:domain ex:House ; 
+	rdfs:range ex:House .
+
+ex:Person a owl:Class ; 
+  	owl:equivalentClass [ 
+	owl:oneOf (ex:i ex:ii ex:iii ex:iiii ex:iiiii) 
+	] .
+
+ex:Nationalities a owl:Class ; 
+  	owl:equivalentClass [ 
+	owl:oneOf (ex:brit ex:swede ex:dane ex:norwegian ex:german) 
+	] .
+	owl:AllDifferent owl:distinctMembers (ex:brit ex:swede ex:dane ex:norwegian ex:german) .
+
+ex:Colors a owl:Class ; 
+  	owl:equivalentClass [ 
+	owl:oneOf (ex:red ex:green ex:white ex:yellow ex:blue) 
+	] .
+	owl:AllDifferent owl:distinctMembers (ex:red ex:green ex:white ex:yellow ex:blue) .
+
+ex:Cigarettes a owl:Class ; 
+  	owl:equivalentClass [ 
+	owl:oneOf (ex:pallmall ex:dunhill ex:blends ex:bluemaster ex:prince) 
+	] .
+	owl:AllDifferent owl:distinctMembers (ex:pallmall ex:dunhill ex:blends ex:bluemaster ex:prince) .
+
+ex:Drinks a owl:Class ;
+  	owl:equivalentClass [
+	owl:oneOf (ex:tea ex:coffee ex:water ex:milk ex:beer)
+	] .
+	owl:AllDifferent owl:distinctMembers (ex:tea ex:coffee ex:water ex:milk ex:beer) .
+
+ex:Animals a owl:Class ; 
+  	owl:equivalentClass [ 
+	owl:oneOf (ex:dog ex:bird ex:fish ex:cat ex:horse) 
+	] .
+	owl:AllDifferent owl:distinctMembers (ex:dog ex:bird ex:fish ex:cat ex:horse) .
+
+
+
+########################### DEFINE PROPERTIES ####################################
+
+#Person livesIn a House and the house is ownedBy the person who lives in it. 
+ex:livesIn a owl:FunctionalProperty ;
+  a owl:InverseFunctionalProperty ;
+  owl:inverseOf ex:ownedBy ;
+  rdfs:domain ex:Person ;
+  rdfs:range ex:Houses .
+
+#Person hasNationality of a type nationality. 
+ex:hasNationality a owl:FunctionalProperty ;
+  a owl:InverseFunctionalProperty ;
+  rdfs:domain ex:Person ;
+  rdfs:range ex:Nationalities .
+
+#House hasColor of type colors. 
+ex:hasColor a owl:FunctionalProperty ;
+  a owl:InverseFunctionalProperty ;
+  rdfs:domain ex:Houses ;
+  rdfs:range ex:Colors .
+
+#Person smokes a type ciggerette. 
+ex:smokes a owl:FunctionalProperty ;
+  a owl:InverseFunctionalProperty ;
+  rdfs:domain ex:Person ;
+  rdfs:range ex:Cigarettes .
+
+#Person drinks a type of drink. 
+ex:drinks a owl:FunctionalProperty ;
+  a owl:InverseFunctionalProperty ;
+  rdfs:domain ex:Person ;
+  rdfs:range ex:Drinks.
+
+#Person keepAnimal of type animal. 
+ex:hasAnimal a owl:FunctionalProperty ;
+  a owl:InverseFunctionalProperty ;
+  rdfs:domain ex:Person ;
+  rdfs:range ex:Animals.
+
+
+############################## ASSSERTIONS #########################################
+ 
+#Asserting house colors 
+ex:greenHouse ex:hasColor ex:green .
+ex:whiteHouse ex:hasColor ex:white .
+ex:redHouse ex:hasColor ex:red .
+ex:yellowHouse ex:hasColor ex:yellow .
+ex:blueHouse ex:hasColor ex:blue .
+
+
+
+#The Brit lives in a red house. 
+ex:x01 a ex:Person ; 
+	ex:hasNationality ex:brit ; 
+	ex:livesIn ex:redHouse .
+
+
+
+#The Swede keeps dogs as pets. 
+ex:x02 a ex:Person ; 
+	ex:hasNationality ex:swede ; 
+	ex:hasAnimal ex:dog .
+
+
+#The Dane drinks tea. 
+ex:x03 a ex:Person ; 
+	ex:hasNationality ex:dane; 
+	ex:drinks ex:tea .
+
+
+#The green house is next to, and on the left of the white house. 
+ex:greenHouse ex:leftOf ex:whiteHouse .
+
+
+#The owner of the green house drinks coffee. 
+ex:x05 a ex:Person ; 
+	ex:livesIn ex:greenHouse ; 
+	ex:drinks ex:coffee .
+
+
+#The person who smokes Pall Mall rears birds. 
+ex:x06 a ex:Person ; 
+	ex:smokes ex:pallmall ; 
+	ex:hasAnimal ex:bird .
+
+
+#The man living in the center house drinks milk. 
+ex:x07 a ex:Person ; 
+	ex:livesIn ex:three ; 
+	ex:drinks ex:milk .
+
+
+#The owner of the yellow house smokes Dunhill. 
+ex:x08 a ex:Person ; 
+	ex:livesIn ex:yellowHouse ; 
+	ex:smokes ex:dunhill .
+
+
+#The Norwegian lives in the first house. 
+ex:x09 a ex:Person ; 
+	ex:hasNationality ex:norwegian ; 
+	ex:livesIn ex:one .
+
+
+#The man who smokes blends lives next to the one who keeps cats.
+ex:x10 a ex:Person ; 
+	ex:smokes ex:blends ; 
+	ex:livesIn [ a ex:Houses ; 
+	ex:nextTo [ a ex:Houses ;
+	ex:ownedBy [ a ex:Person ;
+	ex:hasAnimal ex:cat
+	]]] .
+
+
+
+#The man who keeps horses lives next to the man who smokes Dunhill. 
+ex:x11 a ex:Person ; 
+	ex:smokes ex:dunhill ;
+	ex:livesIn [ a ex:Houses ; 
+	ex:nextTo [ a ex:Houses ; 
+	ex:ownedBy [ a ex:Person ;
+	ex:hasAnimal ex:horse
+	]]] .
+
+
+#The man who smokes Blue Master drinks beer.
+ex:x12 a ex:Person ; 
+	ex:smokes ex:bluemaster ; 
+	ex:drinks ex:beer .
+
+
+#The German smokes Prince. 
+ex:x13 a ex:Person ; 
+	ex:hasNationality ex:german ; 
+	ex:smokes ex:prince .
+
+
+#The Norwegian lives next to the blue house. 
+ex:x14 a ex:Person ; 
+	ex:hasNationality ex:norwegian ;
+	ex:livesIn [ a ex:Houses ; 
+	ex:nextTo ex:blueHouse 
+	] .
+
+
+#The man who smokes blends has a neighbor who drinks water.
+ex:x15 a ex:Person ; 
+	ex:smokes ex:blends ;
+	ex:livesIn [ a ex:Houses ; 
+	ex:nextTo [ a ex:Houses ;
+	ex:ownedBy [ a ex:Person ;
+	ex:drinks ex:water
+	]]] .
+
+
+
+
