@@ -1,5 +1,9 @@
-In a street there are five houses in a
-row.
+
+This repo solves Einstein's Riddle using RDF/OWL semantic reasoning.
+
+##Einstein's Riddle##
+
+In a street there are five houses in a row.
 Each is painted a different color.
 Each is owned by a person of different
 nationality.
@@ -26,5 +30,3 @@ Clues:
 13. The German smokes Prince.
 14. The Norwegian lives next to the blue house.
 15. The man who smokes Blends has a neighbor who drinks water.
-
-The code provided solves the problem using RDF/OWL semantic reasoning.
